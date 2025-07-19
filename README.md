@@ -1,11 +1,12 @@
 # vro-bot
 my silly little vro bot for my discord server
 ## Build:
-on windows run
+make sure you have the dependancys then
+ - if on windows run
 ```
 build.bat
 ```
-on a *nix system run
+ - if on a *nix system run
 ```
 chmod +x build.sh
 ./build.sh
