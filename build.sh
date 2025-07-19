@@ -4,7 +4,7 @@ set -e
 
 echo "Building..."
 
-go build -o vro-bot bot.go
+go build -o vro-bot-sexless bot.go
 
 echo "Done!"
 
