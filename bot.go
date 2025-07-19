@@ -128,23 +128,19 @@ func hourlyMessage(self *discordgo.Session) {
 		for {
 			<- ticker.C
 			fmt.Println("Hourly Message Sending to channels ", config.Channel)
-			if len(config.Channel) == 0 {
-				fmt.Println("No channels configed... will not send!")
-			} else {
-				for _, ch := range config.Channel {
-					server, err := self.Guild(ch.Server)
-					if err != nil {
-						fmt.Println("WARN: Count get guild info:", err)
-					}
 
-					fmt.Println("Sending hourly message to ", ch.Channel, "in the guild", ch.Server, "with name", server.Name)
-
-					sendRand(self, ch.Channel)
-
-					fmt.Println("Sent!")
+			for _, ch := range config.Channel {
+				server, err := self.Guild(ch.Server)
+				if err != nil {
+					fmt.Println("WARN: Couldnt get guild info:", err)
 				}
-				fmt.Println("Sent to all configured servers!")
+				fmt.Println("Sending hourly message to ", ch.Channel, "in the guild", ch.Server, "with name", server.Name)
+
+				sendRand(self, ch.Channel)
+				fmt.Println("Sent!")
+
 			}
+			fmt.Println("Sent to all configured servers!")
 		}
 	}()
 }
