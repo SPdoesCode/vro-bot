@@ -18,13 +18,18 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+type channels struct {
+	Server 	string 		`toml:"server"`
+	Channel string 		`toml:"channel"`
+}
+
 type CFG struct {
-	Token     string   `toml:"token"`
-	Prefix    string   `toml:"prefix"`
-	ImageDir  string   `toml:"image_dir"`
-	Images    []string `toml:"images"`
-	Channel   string   `toml:"channel"`
-	Deaths	  []string `toml:"deaths"`
+	Token     string   	`toml:"token"`
+	Prefix    string   	`toml:"prefix"`
+	ImageDir  string   	`toml:"image_dir"`
+	Images    []string 	`toml:"images"`
+	Channel   []channels   	`toml:"channel"`
+	Deaths	  []string 	`toml:"deaths"`
 }
 
 var config CFG
@@ -90,26 +95,26 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 			case "sex": // this is a joke command
 				fmt.Println("Command is sex with args as ", args , " sent by ", message.Author.ID)
 				if rand.Intn(2) == 0 {
-					self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
+					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
 					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!\" to ", message.ChannelID)
 				} else {
-					self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
+					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
 					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
 				}
 			case "kill":
 				fmt.Println("Command is kill with args as ", args , " sent by ", message.Author.ID)
 				if len(config.Deaths) == 0 {
-					self.ChannelMessageSend(Channel, "No deaths configured.")
+					self.ChannelMessageSend(message.ChannelID, "No deaths configured.")
 					fmt.Println("WARN: No images in config.Deaths")
 					break
 				}
 				dnum := rand.Intn(len(config.Deaths))
 
-				self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+Deaths[dnum])
-				fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+Deaths[dnum]+"\" to ", message.ChannelID)
+				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum])
+				fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum]+"\" to ", message.ChannelID)
 
 			default :
-				fmt.Println("No ", endcmd, "command found!")
+				fmt.Println("No ", cmd, "command found!")
 		}
 	}
 }
@@ -122,8 +127,24 @@ func hourlyMessage(self *discordgo.Session) {
 
 		for {
 			<- ticker.C
-			sendRand(self, config.Channel)
+			fmt.Println("Hourly Message Sending to channels ", config.Channel)
+			if len(config.Channel) == 0 {
+				fmt.Println("No channels configed... will not send!")
+			} else {
+				for _, ch := range config.Channel {
+					server, err := self.Guild(ch.Server)
+					if err != nil {
+						fmt.Println("WARN: Count get guild info:", err)
+					}
 
+					fmt.Println("Sending hourly message to ", ch.Channel, "in the guild", ch.Server, "with name", server.Name)
+
+					sendRand(self, ch.Channel)
+
+					fmt.Println("Sent!")
+				}
+				fmt.Println("Sent to all configured servers!")
+			}
 		}
 	}()
 }
@@ -142,13 +163,13 @@ func main() {
 
 	bot.AddHandler(ctrlMessages) // grab messages into the message control
 
+	bot.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsMessageContent // request perms
+
 	err2 := bot.Open() // try to open the connection
 	if err2 != nil {
 		fmt.Println("ERROR: Coulnt open the connection: ", err2)
 		os.Exit(1)
 	}
-
-	bot.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsMessageContent
 
 	defer bot.Close() // close the connection when done
 

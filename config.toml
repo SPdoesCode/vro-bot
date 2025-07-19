@@ -20,4 +20,6 @@ deaths = [ # put the list of items that a user can be killed with
 
 # Every hour command config:
 
-channel = "123456789012345678" # Set this to the ID of the channel
+channel = [ # Set this to the ID of the channels you want the hourly bot to send, configed like {server = serverid, channel = channelid}
+    {server = "123456789012345678", channel = "123456789012345678" }
+]
