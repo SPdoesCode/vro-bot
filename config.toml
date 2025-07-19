@@ -1,0 +1,18 @@
+#
+#   Vro Bot Default Config
+#
+
+# General bot config:
+
+token = "Put the discord bot token here!!" # Set this to the token of the bot
+prefix = "?" # Set this to the desirsed prefix
+image_dir = "/path/to/photos/" # Set this to the path of the photos like C:/Users/user/vro-photos/ on windows or /home/user/vro-photos/ on a *nix system
+images = [ # Put the files you have here, can be a video or gif too desipite the variable
+    "hi.png",
+    "croc.png",
+    "mongal.png"
+]
+
+# Every hour command config:
+
+channel = "123456789012345678" # Set this to the ID of the channel
