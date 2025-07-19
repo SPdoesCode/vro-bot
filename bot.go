@@ -78,6 +78,8 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	if strings.HasPrefix(message.Content, config.Prefix) { // check for the prefix
+		getConfig()
+		fmt.Println("Reloaded config...")
 		args := strings.Fields(message.Content)
 		cmd := strings.TrimPrefix(args[0], config.Prefix) // remove it
 		fmt.Println("Got command (", message.Content, ") and stripped prefix ", config.Prefix)
