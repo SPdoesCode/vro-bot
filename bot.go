@@ -67,7 +67,8 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 		return // return nothing cuz its our own message
 	}
 
-	if message.Content == config.Prefix+"getvro" {
+	getvro := config.Prefix+"getvro"
+	if message.Content == getvro {
 		sendRand(self, message.ChannelID)
 
 	}
