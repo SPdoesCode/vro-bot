@@ -11,11 +11,12 @@ chmod +x build.sh
 ./build.sh
 ```
 ## usage:
-if on windows run 
+make sure the config file is there and its set properly then
+- if on windows run 
 ```
 vro-bot.exe
 ```
-or if on a *nix system use
+- if on a *nix system use
 ```
 ./vro-bot
 ```
