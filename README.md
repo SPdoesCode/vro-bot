@@ -10,7 +10,7 @@ on a *nix system run
 chmod +x build.sh
 ./build.sh
 ```
-## usage
+## usage:
 if on windows run 
 ```
 vro-bot.exe
@@ -19,3 +19,6 @@ or if on a *nix system use
 ```
 ./vro-bot
 ```
+## dependancys:
+  - [golang](https://go.dev/dl/)
+  - everything else managed by Golang's package system 
