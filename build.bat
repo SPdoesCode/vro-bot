@@ -2,7 +2,7 @@
 
 echo Building...
 
-go build -o vro-bot.exe  bot.go
+go build -o vro-bot-sexless.exe  bot.go
 
 if %ERRORLEVEL% neq 0 (
     echo Build failed!
