@@ -92,15 +92,6 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 			case "getvro":
 				fmt.Println("Command is getvro, sending sendRand() to channel ", message.ChannelID)
 				sendRand(self, message.ChannelID)
-			case "sex": // this is a joke command
-				fmt.Println("Command is sex with args as ", args , " sent by ", message.Author.ID)
-				if rand.Intn(2) == 0 {
-					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
-					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!\" to ", message.ChannelID)
-				} else {
-					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
-					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
-				}
 			case "kill":
 				fmt.Println("Command is kill with args as ", args , " sent by ", message.Author.ID)
 				if len(config.Deaths) == 0 {
