@@ -10,6 +10,6 @@ if %ERRORLEVEL% neq 0 (
     exit /b %ERRORLEVEL%
 )
 
-echo Done! To use run vro-bot.exe
+echo Done! To use run vro-bot-sexless.exe
 
 pause
