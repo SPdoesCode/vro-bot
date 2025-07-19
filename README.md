@@ -15,11 +15,11 @@ chmod +x build.sh
 make sure the config file is there and its set properly then
 - if on windows run 
 ```
-vro-bot.exe
+vro-bot-sexless.exe
 ```
 - if on a *nix system use
 ```
-./vro-bot
+./vro-bot-sexless
 ```
 ## dependancys:
   - [golang](https://go.dev/dl/)
