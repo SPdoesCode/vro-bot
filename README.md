@@ -1,5 +1,5 @@
-# vro-bot
-my silly little vro bot for my discord server
+# vro-bot-sexless
+my silly little vro bot for my discord server, without the sex command
 ## Build:
 make sure you have the dependancys then
  - if on windows run
