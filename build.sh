@@ -8,6 +8,6 @@ go build -o vro-bot-sexless bot.go
 
 echo "Done!"
 
-echo "To run use ./vro-bot"
+echo "To run use ./vro-bot-sexless"
 
 exit 0
