@@ -24,10 +24,10 @@ type CFG struct {
 	ImageDir  string   `toml:"image_dir"`
 	Images    []string `toml:"images"`
 	Channel   string   `toml:"channel"`
+	Deaths	  []string `toml:"deaths"`
 }
 
 var config CFG
-
 
 func getConfig() {
 
@@ -41,7 +41,7 @@ func getConfig() {
 }
 
 func sendRand(self *discordgo.Session, Channel string) {
-	rand.Seed(time.Now().UnixNano())
+
 	if len(config.Images) == 0 {
 		self.ChannelMessageSend(Channel, "No images configured.")
 		fmt.Println("WARN: No images in config.Images")
@@ -71,19 +71,43 @@ func sendRand(self *discordgo.Session, Channel string) {
 
 // for commands only
 func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
-	fmt.Println("Message received: ", message.Content)
+	//fmt.Println("Message received: ", message.Content)
 
 	if message.Author.ID == self.State.User.ID {
 		return // return nothing cuz its our own message
 	}
 
 	if strings.HasPrefix(message.Content, config.Prefix) { // check for the prefix
-		endcmd := strings.TrimPrefix(message.Content, config.Prefix) // remove it
-		fmt.Println("Got command and stripped prefix: ", config.Prefix)
-		switch endcmd { // switch it to see what command it is
+		args := strings.Fields(message.Content)
+		cmd := strings.TrimPrefix(args[0], config.Prefix) // remove it
+		fmt.Println("Got command (", message.Content, ") and stripped prefix ", config.Prefix)
+		switch cmd { // switch it to see what command it is
 			case "getvro":
-				fmt.Println("Command is getvro, sending sendRand() to channel: ", message.ChannelID)
+				fmt.Println("Command is getvro, sending sendRand() to channel ", message.ChannelID)
 				sendRand(self, message.ChannelID)
+			case "sex": // this is a joke command
+				fmt.Println("Command is sex with args as ", args , " sent by ", message.Author.ID)
+				if rand.Intn(2) == 0 {
+					self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
+					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!\" to ", message.ChannelID)
+				} else {
+					self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
+					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
+				}
+			case "kill":
+				fmt.Println("Command is kill with args as ", args , " sent by ", message.Author.ID)
+				if len(config.Deaths) == 0 {
+					self.ChannelMessageSend(Channel, "No deaths configured.")
+					fmt.Println("WARN: No images in config.Deaths")
+					break
+				}
+				dnum := rand.Intn(len(config.Deaths))
+
+				self.ChannelMessageSend(Channel, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+Deaths[dnum])
+				fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+Deaths[dnum]+"\" to ", message.ChannelID)
+
+			default :
+				fmt.Println("No ", endcmd, "command found!")
 		}
 	}
 }
@@ -105,6 +129,8 @@ func hourlyMessage(self *discordgo.Session) {
 func main() {
 
 	getConfig()
+
+	rand.Seed(time.Now().UnixNano())
 
 	bot, err := discordgo.New("Bot "+config.Token) // grab the token and make a new session
 	if err != nil {

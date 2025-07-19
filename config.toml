@@ -12,6 +12,11 @@ images = [ # Put the files you have here, can be a video or gif too desipite the
     "croc.png",
     "mongal.png"
 ]
+deaths = [ # put the list of items that a user can be killed with
+    "baseball bat",
+    "glock 10",
+    "ar10"
+]
 
 # Every hour command config:
 
