@@ -8,28 +8,29 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"math/rand"
 	"os"
 	"os/signal"
-	"syscall"
 	"strings"
+	"syscall"
+	"time"
+
 	"github.com/BurntSushi/toml"
 	"github.com/bwmarrin/discordgo"
 )
 
 type channels struct {
-	Server 	string 		`toml:"server"`
-	Channel string 		`toml:"channel"`
+	Server  string `toml:"server"`
+	Channel string `toml:"channel"`
 }
 
 type CFG struct {
-	Token     string   	`toml:"token"`
-	Prefix    string   	`toml:"prefix"`
-	ImageDir  string   	`toml:"image_dir"`
-	Images    []string 	`toml:"images"`
-	Channel   []channels   	`toml:"channel"`
-	Deaths	  []string 	`toml:"deaths"`
+	Token    string     `toml:"token"`
+	Prefix   string     `toml:"prefix"`
+	ImageDir string     `toml:"image_dir"`
+	Images   []string   `toml:"images"`
+	Channel  []channels `toml:"channel"`
+	Deaths   []string   `toml:"deaths"`
 }
 
 var config CFG
@@ -53,10 +54,14 @@ func sendRand(self *discordgo.Session, Channel string) {
 		return
 	}
 	num := rand.Intn(len(config.Images))
-	filename := config.ImageDir+config.Images[num] // get the random file
+	filename := config.ImageDir + config.Images[num] // get the random file
 	fmt.Println("Selected image: ", filename)
 	file, err := os.Open(filename)
-	if err != nil { self.ChannelMessageSend(Channel, "Couldnt find image, sorry"); fmt.Println("WARN: Failed to find image ", filename,": ", err); return } // warn and alert to the error
+	if err != nil {
+		self.ChannelMessageSend(Channel, "Couldnt find image, sorry")
+		fmt.Println("WARN: Failed to find image ", filename, ": ", err)
+		return
+	} // warn and alert to the error
 	defer file.Close() // we need to close
 	_, err = self.ChannelMessageSendComplex(Channel, &discordgo.MessageSend{
 		Files: []*discordgo.File{
@@ -69,7 +74,7 @@ func sendRand(self *discordgo.Session, Channel string) {
 	fmt.Println("Send image: ", file, filename)
 	if err != nil {
 		self.ChannelMessageSend(Channel, "Couldnt open image...")
-		fmt.Println("WARN: Failed to find image ", filename,": ", err)
+		fmt.Println("WARN: Failed to find image ", filename, ": ", err)
 	}
 
 }
@@ -89,44 +94,47 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 		cmd := strings.TrimPrefix(args[0], config.Prefix) // remove it
 		fmt.Println("Got command (", message.Content, ") and stripped prefix ", config.Prefix)
 		switch cmd { // switch it to see what command it is
-			case "getvro":
-				fmt.Println("Command is getvro, sending sendRand() to channel ", message.ChannelID)
-				sendRand(self, message.ChannelID)
-			case "sex": // this is a joke command
-				fmt.Println("Command is sex with args as ", args , " sent by ", message.Author.ID)
-				if rand.Intn(2) == 0 {
-					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
-					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!\" to ", message.ChannelID)
-				} else {
-					self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
-					fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
-				}
-			case "kill":
-				fmt.Println("Command is kill with args as ", args , " sent by ", message.Author.ID)
-				if len(config.Deaths) == 0 {
-					self.ChannelMessageSend(message.ChannelID, "No deaths configured.")
-					fmt.Println("WARN: No images in config.Deaths")
-					break
-				}
-				dnum := rand.Intn(len(config.Deaths))
+		case "getvro":
+			fmt.Println("Command is getvro, sending sendRand() to channel ", message.ChannelID)
+			sendRand(self, message.ChannelID)
 
-				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum])
-				fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum]+"\" to ", message.ChannelID)
+		case "sex": // this is a joke command
+			fmt.Println("Command is sex with args as ", args, " sent by ", message.Author)
+			if rand.Intn(2) == 0 {
+				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!")
+				fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and made them pregnant!\" to ", message.ChannelID)
+			} else {
+				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!")
+				fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
+			}
 
-			default :
-				fmt.Println("No ", cmd, "command found!")
+		case "kill":
+			fmt.Println("Command is kill with args as ", args, " sent by ", message.Author)
+			if len(config.Deaths) == 0 {
+				self.ChannelMessageSend(message.ChannelID, "No deaths configured.")
+				fmt.Println("WARN: No images in config.Deaths")
+				break
+			}
+			dnum := rand.Intn(len(config.Deaths))
+
+			self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum])
+			fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum]+"\" to ", message.ChannelID)
+
+		default:
+			self.ChannelMessageSend(message.ChannelID, "Command "+cmd+" not found!")
+			fmt.Println("No ", cmd, "command found!")
 		}
 	}
 }
 
 // every hour message hanndler
 func hourlyMessage(self *discordgo.Session) {
-	go func(){
+	go func() {
 		ticker := time.NewTicker(1 * time.Hour) // set up the hour control
 		defer ticker.Stop()
 
 		for {
-			<- ticker.C
+			<-ticker.C
 			fmt.Println("Hourly Message Sending to channels ", config.Channel)
 
 			for _, ch := range config.Channel {
@@ -151,7 +159,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	bot, err := discordgo.New("Bot "+config.Token) // grab the token and make a new session
+	bot, err := discordgo.New("Bot " + config.Token) // grab the token and make a new session
 	if err != nil {
 		fmt.Println("ERROR: Couldnt create discord session: ", err)
 		os.Exit(1)
@@ -176,7 +184,7 @@ func main() {
 	hourlyMessage(bot) // start the hourly message
 
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	<- quit // stop when indicated
+	<-quit // stop when indicated
 
 	fmt.Println("Quiting...")
 
