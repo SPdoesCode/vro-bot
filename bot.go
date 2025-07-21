@@ -120,8 +120,27 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 			self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum])
 			fmt.Println("Sent: \"<@"+message.Author.ID+"> killed "+strings.Join(args[1:], " ")+" with a "+config.Deaths[dnum]+"\" to ", message.ChannelID)
 
+		case "eat":
+			fmt.Println("Command is hug with args as ", args, " sent by ", message.Author)
+			self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> ate "+strings.Join(args[1:], " ")+" kindly with love <3")
+			fmt.Println("Sent \"<@" + message.Author.ID + "> huged " + strings.Join(args[1:], " ") + " kindly...\"")
+
+		case "hug":
+			fmt.Println("Command is eat with args as ", args, " sent by ", message.Author)
+			if rand.Intn(56+56*2) == 8 {
+				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> huged "+strings.Join(args[1:], " ")+" kindly... then started to eat them...")
+			} else {
+				self.ChannelMessageSend(message.ChannelID, "<@"+message.Author.ID+"> huged "+strings.Join(args[1:], " ")+" kindly... nothing else...")
+			}
+			fmt.Println("Sent \"<@" + message.Author.ID + "> huged " + strings.Join(args[1:], " ") + " kindly...\"")
+
+		case "help":
+			fmt.Println("Command is help with args as ", args, " sent by ", message.Author)
+			self.ChannelMessageSend(message.ChannelID, "Commands: help, kill, sex, getvro, eat, hug")
+			fmt.Println("Sent help message")
+
 		default:
-			self.ChannelMessageSend(message.ChannelID, "Command "+cmd+" not found!")
+			self.ChannelMessageSend(message.ChannelID, "Command "+cmd+" not found! Try the help command for more commands!")
 			fmt.Println("No ", cmd, "command found!")
 		}
 	}
