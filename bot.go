@@ -87,14 +87,6 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 		return // return nothing cuz its our own message
 	}
 
-	if message.Content == "vro bot is the best bot" {
-		_, err := self.ChannelMessageSendReply(message.ChannelID, "this is true", message.Reference())
-		if err != nil {
-			fmt.Println("WARN: Failed to send reply: ", err)
-		}
-		fmt.Println("Vro bot is the best bot  replyied to ", message.Author)
-	}
-
 	if strings.HasPrefix(message.Content, config.Prefix) { // check for the prefix
 		getConfig()
 		fmt.Println("Reloaded config...")
@@ -116,40 +108,8 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 				fmt.Println("Sent: \"<@"+message.Author.ID+"> had sex with "+strings.Join(args[1:], " ")+" and failed to make them pregnant!\" to ", message.ChannelID)
 			}
 
-		case "cyxigo":
-			fmt.Println("Command is cyxigo with args as ", args, " sent by ", message.Author)
-			file, err := os.Open("cyxigo.jpg")
-			if err != nil {
-				self.ChannelMessageSend(message.ChannelID, "Couldnt find cyxigo image, sorry")
-				fmt.Println("WARN: Failed to find image of cyxigo: ", err)
-				break
-			}
-			defer file.Close()
-			_, err = self.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
-				Files: []*discordgo.File{
-					{
-						Name:   "cyxigo.jpg",
-						Reader: file,
-					},
-				},
-			})
-			if err != nil {
-				self.ChannelMessageSend(message.ChannelID, "Couldnt open image...")
-				fmt.Println("WARN: Failed to open image of cyxigo: ", err)
-			}
-			fmt.Println("Sent image of cyxigo!")
-
-		case "infolol":
-			fmt.Println("Command is infolol with args as ", args, " sent by ", message.Author)
-			self.ChannelMessageSend(message.ChannelID, "This is a lot of info the discordgo api gives lol:")
-			self.ChannelMessageSend(message.ChannelID, "message.ChannelID: "+message.ChannelID)
-			self.ChannelMessageSend(message.ChannelID, "message.Author.ID: "+message.Author.ID)
-			self.ChannelMessageSend(message.ChannelID, "message.ID: "+message.ID)
-			self.ChannelMessageSend(message.ChannelID, "I could also see a lot more...")
-			fmt.Println("A bunch of random stuff was sent...")
-
 		case "kill":
-			fmt.Println("Command is kill with args as ", args, " sent by ", message.Author.ID)
+			fmt.Println("Command is kill with args as ", args, " sent by ", message.Author)
 			if len(config.Deaths) == 0 {
 				self.ChannelMessageSend(message.ChannelID, "No deaths configured.")
 				fmt.Println("WARN: No images in config.Deaths")
@@ -199,23 +159,19 @@ func hourlyMessage(self *discordgo.Session) {
 		for {
 			<-ticker.C
 			fmt.Println("Hourly Message Sending to channels ", config.Channel)
-			if len(config.Channel) == 0 {
-				fmt.Println("No channels configed... will not send!")
-			} else {
-				for _, ch := range config.Channel {
-					server, err := self.Guild(ch.Server)
-					if err != nil {
-						fmt.Println("WARN: Count get guild info:", err)
-					}
 
-					fmt.Println("Sending hourly message to ", ch.Channel, "in the guild", ch.Server, "with name", server.Name)
-
-					sendRand(self, ch.Channel)
-
-					fmt.Println("Sent!")
+			for _, ch := range config.Channel {
+				server, err := self.Guild(ch.Server)
+				if err != nil {
+					fmt.Println("WARN: Couldnt get guild info:", err)
 				}
-				fmt.Println("Sent to all configured servers!")
+				fmt.Println("Sending hourly message to ", ch.Channel, "in the guild", ch.Server, "with name", server.Name)
+
+				sendRand(self, ch.Channel)
+				fmt.Println("Sent!")
+
 			}
+			fmt.Println("Sent to all configured servers!")
 		}
 	}()
 }
