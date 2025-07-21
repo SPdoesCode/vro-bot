@@ -95,7 +95,8 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 		fmt.Println("Got command (", message.Content, ") and stripped prefix ", config.Prefix)
 		switch cmd { // switch it to see what command it is
 		case "getvro":
-			fmt.Println("Command is getvro, sending sendRand() to channel ", message.ChannelID)
+			fmt.Println("Command is getvro with args as ", args, " sent by ", message.Author)
+			fmt.Println("Sending sendRand() to channel ", message.ChannelID)
 			sendRand(self, message.ChannelID)
 
 		case "sex": // this is a joke command
@@ -140,7 +141,7 @@ func ctrlMessages(self *discordgo.Session, message *discordgo.MessageCreate) {
 
 		case "help":
 			fmt.Println("Command is help with args as ", args, " sent by ", message.Author)
-			self.ChannelMessageSend(message.ChannelID, "Commands: help, kill, sex, getvro, eat, hug")
+			self.ChannelMessageSend(message.ChannelID, "Commands: help, kill, sex, getvro, eat, hug, goonto")
 			fmt.Println("Sent help message")
 
 		default:
