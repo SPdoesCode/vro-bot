@@ -183,17 +183,25 @@ func hourlyMessage(self *discordgo.Session) {
 // slash command handler
 func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 	var args string
+	var username, userID string
+	if cmd.Member != nil {
+		username = cmd.Member.User.Username
+		userID = cmd.Member.User.ID
+	} else {
+		username = cmd.User.Username
+		userID = cmd.User.ID
+	}
 	options := cmd.ApplicationCommandData().Options
 	for _, opt := range options {
 		args = opt.StringValue()
 	}
 	switch cmd.ApplicationCommandData().Name {
 	case "getvro":
-		fmt.Println("Command is getvro with args as ", args, " sent by ", cmd.Member.User.Username)
+		fmt.Println("Command is getvro with args as ", args, " sent by ", username)
 		fmt.Println("Sending sendRand() to channel ", cmd.ChannelID)
 		sendRand(self, cmd.ChannelID)
 	case "kill":
-		fmt.Println("Command is kill with args as ", args, " sent by ", cmd.Member.User.Username)
+		fmt.Println("Command is kill with args as ", args, " sent by ", username)
 		if len(config.Deaths) == 0 {
 			self.ChannelMessageSend(cmd.ChannelID, "No deaths configured.")
 			fmt.Println("WARN: No images in config.Deaths")
@@ -201,38 +209,38 @@ func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 		}
 		dnum := rand.Intn(len(config.Deaths))
 
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> killed "+args+" with a "+config.Deaths[dnum])
-		fmt.Println("Sent: \"<@"+cmd.Member.User.ID+"> killed "+args+" with a "+config.Deaths[dnum]+"\" to ", cmd.ChannelID)
+		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> killed "+args+" with a "+config.Deaths[dnum])
+		fmt.Println("Sent: \"<@"+userID+"> killed "+args+" with a "+config.Deaths[dnum]+"\" to ", cmd.ChannelID)
 	case "sex": // this is a joke command
-		fmt.Println("Command is sex with args as ", args, " sent by ", cmd.Member.User.Username)
+		fmt.Println("Command is sex with args as ", args, " sent by ", username)
 		if rand.Intn(2) == 0 {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> had sex with "+args+" and made them pregnant!")
-			fmt.Println("Sent: \"<@"+cmd.Member.User.ID+"> had sex with "+args+" and made them pregnant!\" to ", cmd.ChannelID)
+			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> had sex with "+args+" and made them pregnant!")
+			fmt.Println("Sent: \"<@"+userID+"> had sex with "+args+" and made them pregnant!\" to ", cmd.ChannelID)
 		} else {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> had sex with "+args+" and failed to make them pregnant!")
-			fmt.Println("Sent: \"<@"+cmd.Member.User.ID+"> had sex with "+args+" and failed to make them pregnant!\" to ", cmd.ChannelID)
+			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> had sex with "+args+" and failed to make them pregnant!")
+			fmt.Println("Sent: \"<@"+userID+"> had sex with "+args+" and failed to make them pregnant!\" to ", cmd.ChannelID)
 		}
 	case "hug":
-		fmt.Println("Command is eat with args as ", args, " sent by ", cmd.Member.User.Username)
+		fmt.Println("Command is eat with args as ", args, " sent by ", username)
 		if rand.Intn(56+56*2) == 8 {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> huged "+args+" kindly... then started to eat them...")
-			fmt.Println("Sent \"<@"+cmd.Member.User.ID+"> huged "+args+" kindly... then started to eat them...\" to ", cmd.ChannelID)
+			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> huged "+args+" kindly... then started to eat them...")
+			fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly... then started to eat them...\" to ", cmd.ChannelID)
 		} else {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> huged "+args+" kindly... nothing else...")
-			fmt.Println("Sent \"<@"+cmd.Member.User.ID+"> huged "+args+" kindly... nothing else...\" to ", cmd.ChannelID)
+			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> huged "+args+" kindly... nothing else...")
+			fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly... nothing else...\" to ", cmd.ChannelID)
 		}
 
 	case "goonto": // yet another obv joke command
-		fmt.Println("Command is goonto with args as ", args, " sent by ", cmd.Member.User.Username)
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> gooned to "+args+"!!!!11!")
+		fmt.Println("Command is goonto with args as ", args, " sent by ", username)
+		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> gooned to "+args+"!!!!11!")
 
 	case "eat":
-		fmt.Println("Command is hug with args as ", args, " sent by ", cmd.Member.User.Username)
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+cmd.Member.User.ID+"> ate "+args+" kindly with love <3")
-		fmt.Println("Sent \"<@"+cmd.Member.User.ID+"> huged "+args+" kindly with love <3\" to ", cmd.ChannelID)
+		fmt.Println("Command is hug with args as ", args, " sent by ", username)
+		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> ate "+args+" kindly with love <3")
+		fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly with love <3\" to ", cmd.ChannelID)
 
 	case "help":
-		fmt.Println("Command is help with args as ", args, " sent by ", cmd.Member.User.ID)
+		fmt.Println("Command is help with args as ", args, " sent by ", userID)
 		self.ChannelMessageSend(cmd.ChannelID, "Commands: help, kill, sex, getvro, eat, hug, goonto")
 		fmt.Println("Sent help message to ", cmd.ChannelID)
 	}
