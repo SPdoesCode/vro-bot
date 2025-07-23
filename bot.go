@@ -180,6 +180,16 @@ func hourlyMessage(self *discordgo.Session) {
 	}()
 }
 
+// had to make ts cuz lowk the other one needs too much boilerplait
+func respondTo(self *discordgo.Session, cmd *discordgo.InteractionCreate, content string) {
+	self.InteractionRespond(cmd.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
+	})
+}
+
 // slash command handler
 func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 	var args string
@@ -199,49 +209,50 @@ func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 	case "getvro":
 		fmt.Println("Command is getvro with args as ", args, " sent by ", username)
 		fmt.Println("Sending sendRand() to channel ", cmd.ChannelID)
+		respondTo(self, cmd, "Sending image of vro...")
 		sendRand(self, cmd.ChannelID)
 	case "kill":
 		fmt.Println("Command is kill with args as ", args, " sent by ", username)
 		if len(config.Deaths) == 0 {
-			self.ChannelMessageSend(cmd.ChannelID, "No deaths configured.")
+			respondTo(self, cmd, "No deaths configured.")
 			fmt.Println("WARN: No images in config.Deaths")
 			break
 		}
 		dnum := rand.Intn(len(config.Deaths))
 
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> killed "+args+" with a "+config.Deaths[dnum])
+		respondTo(self, cmd, "<@"+userID+"> killed "+args+" with a "+config.Deaths[dnum])
 		fmt.Println("Sent: \"<@"+userID+"> killed "+args+" with a "+config.Deaths[dnum]+"\" to ", cmd.ChannelID)
 	case "sex": // this is a joke command
 		fmt.Println("Command is sex with args as ", args, " sent by ", username)
 		if rand.Intn(2) == 0 {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> had sex with "+args+" and made them pregnant!")
+			respondTo(self, cmd, "<@"+userID+"> had sex with "+args+" and made them pregnant!")
 			fmt.Println("Sent: \"<@"+userID+"> had sex with "+args+" and made them pregnant!\" to ", cmd.ChannelID)
 		} else {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> had sex with "+args+" and failed to make them pregnant!")
+			respondTo(self, cmd, "<@"+userID+"> had sex with "+args+" and failed to make them pregnant!")
 			fmt.Println("Sent: \"<@"+userID+"> had sex with "+args+" and failed to make them pregnant!\" to ", cmd.ChannelID)
 		}
 	case "hug":
 		fmt.Println("Command is eat with args as ", args, " sent by ", username)
 		if rand.Intn(56+56*2) == 8 {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> huged "+args+" kindly... then started to eat them...")
+			respondTo(self, cmd, "<@"+userID+"> huged "+args+" kindly... then started to eat them...")
 			fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly... then started to eat them...\" to ", cmd.ChannelID)
 		} else {
-			self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> huged "+args+" kindly... nothing else...")
+			respondTo(self, cmd, "<@"+userID+"> huged "+args+" kindly... nothing else...")
 			fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly... nothing else...\" to ", cmd.ChannelID)
 		}
 
 	case "goonto": // yet another obv joke command
 		fmt.Println("Command is goonto with args as ", args, " sent by ", username)
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> gooned to "+args+"!!!!11!")
+		respondTo(self, cmd, "<@"+userID+"> gooned to "+args+"!!!!11!")
 
 	case "eat":
 		fmt.Println("Command is hug with args as ", args, " sent by ", username)
-		self.ChannelMessageSend(cmd.ChannelID, "<@"+userID+"> ate "+args+" kindly with love <3")
+		respondTo(self, cmd, "<@"+userID+"> ate "+args+" kindly with love <3")
 		fmt.Println("Sent \"<@"+userID+"> huged "+args+" kindly with love <3\" to ", cmd.ChannelID)
 
 	case "help":
 		fmt.Println("Command is help with args as ", args, " sent by ", userID)
-		self.ChannelMessageSend(cmd.ChannelID, "Commands: help, kill, sex, getvro, eat, hug, goonto")
+		respondTo(self, cmd, "Commands: help, kill, sex, getvro, eat, hug, goonto")
 		fmt.Println("Sent help message to ", cmd.ChannelID)
 	}
 }
@@ -325,13 +336,6 @@ func main() {
 		},
 	}
 
-	for _, cmd := range cmds {
-		_, err := bot.ApplicationCommandCreate(bot.State.User.ID, "", cmd)
-		if err != nil {
-			fmt.Println("ERROR: Couldnt register command ", cmd, ": ", err)
-		}
-	}
-
 	bot.AddHandler(slashCmd)     // slash commands
 	bot.AddHandler(ctrlMessages) // grab messages into the message control
 
@@ -342,8 +346,15 @@ func main() {
 		fmt.Println("ERROR: Coulnt open the connection: ", err2)
 		os.Exit(1)
 	}
-
 	defer bot.Close() // close the connection when done
+
+	for _, cmd := range cmds {
+		_, err := bot.ApplicationCommandCreate(bot.State.User.ID, "", cmd)
+		fmt.Println("Registering command: ", cmd)
+		if err != nil {
+			fmt.Println("ERROR: Couldnt register command ", cmd, ": ", err)
+		}
+	}
 
 	fmt.Println("Bot should be running properly now, If you need to stop do ctrl + c or ctrl + d!")
 
