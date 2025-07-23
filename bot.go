@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -190,6 +191,41 @@ func respondTo(self *discordgo.Session, cmd *discordgo.InteractionCreate, conten
 	})
 }
 
+func sendRepRand(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
+
+	respondTo(self, cmd, "Sending image of vro...")
+
+	if len(config.Images) == 0 {
+		respondTo(self, cmd, "No images configured.")
+		fmt.Println("WARN: No images in config.Images")
+		return
+	}
+	num := rand.Intn(len(config.Images))
+	filename := config.ImageDir + config.Images[num] // get the random file
+	fmt.Println("Selected image: ", filename)
+	file, err := os.Open(filename)
+	if err != nil {
+		respondTo(self, cmd, "Couldnt find image, sorry")
+		fmt.Println("WARN: Failed to find image ", filename, ": ", err)
+		return
+	} // warn and alert to the error
+	defer file.Close() // we need to close
+	_, err = self.FollowupMessageCreate(cmd.Interaction, true, &discordgo.WebhookParams{
+		Files: []*discordgo.File{
+			{
+				Name:   filepath.Base(filename),
+				Reader: file,
+			},
+		},
+	})
+	fmt.Println("Send image: ", file, filename)
+	if err != nil {
+		respondTo(self, cmd, "Couldnt open image...")
+		fmt.Println("WARN: Failed to find image ", filename, ": ", err)
+	}
+
+}
+
 // slash command handler
 func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 	var args string
@@ -209,8 +245,8 @@ func slashCmd(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 	case "getvro":
 		fmt.Println("Command is getvro with args as ", args, " sent by ", username)
 		fmt.Println("Sending sendRand() to channel ", cmd.ChannelID)
-		respondTo(self, cmd, "Sending image of vro...")
-		sendRand(self, cmd.ChannelID)
+		//respondTo(self, cmd, "Sending image of vro...")
+		sendRepRand(self, cmd)
 	case "kill":
 		fmt.Println("Command is kill with args as ", args, " sent by ", username)
 		if len(config.Deaths) == 0 {
