@@ -24,7 +24,7 @@ func GetConfig() {
 	}
 	for _, file := range files {
 		if !file.IsDir() {
-			Images = append(Config.Images, file.Name())
+			Images = append(Images, file.Name())
 		}
 	}
 }
