@@ -17,7 +17,7 @@ var Images []string
 
 func SendRand(self *discordgo.Session, Channel string) {
 
-	if len(Config.Images) == 0 {
+	if len(Images) == 0 {
 		self.ChannelMessageSend(Channel, "No images configured.")
 		fmt.Println("WARN: No images in Config.Images")
 		return

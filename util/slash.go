@@ -27,7 +27,7 @@ func SendRepRand(self *discordgo.Session, cmd *discordgo.InteractionCreate) {
 
 	RespondTo(self, cmd, "Sending image of vro...")
 
-	if len(Config.Images) == 0 {
+	if len(Images) == 0 {
 		RespondTo(self, cmd, "No images configured.")
 		fmt.Println("WARN: No images in Config.Images")
 		return
