@@ -5,13 +5,12 @@
 # General bot config:
 
 token = "Put the discord bot token here!!" # Set this to the token of the bot
+
 prefix = "?" # Set this to the desirsed prefix
-image_dir = "/path/to/photos/" # Set this to the path of the photos like C:/Users/user/vro-photos/ on windows or /home/user/vro-photos/ on a *nix system
-images = [ # Put the files you have here, can be a video or gif too desipite the variable
-    "hi.png",
-    "croc.png",
-    "mongal.png"
-]
+
+image_dir = "/path/to/photos/" # Set this to the path of the directroy/folder with the photos 
+#  like C:/Users/user/vro-photos/ on windows or /home/user/vro-photos/ on a *nix system
+
 deaths = [ # put the list of items that a user can be killed with
     "baseball bat",
     "glock 10",
@@ -23,3 +22,7 @@ deaths = [ # put the list of items that a user can be killed with
 channel = [ # Set this to the ID of the channels you want the hourly bot to send, configed like {server = serverid, channel = channelid}
     {server = "123456789012345678", channel = "123456789012345678" }
 ]
+
+# The D and M config
+
+gchannel = "123456789012345678" # The channel for all updates happening the global D and M system
